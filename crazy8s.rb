@@ -26,10 +26,14 @@ def turn(player, hand, discardTop)
   playable = []
   puts "\n#{player.owner}: "
   hand.each do|card|
-    print "#{card.cardNum} of #{card.suit}\n"
+    if player.owner == "Player"
+      print "#{card.cardNum} of #{card.suit}\n"
+    end
     if card.value == discardTop.value || card.suit == discardTop.suit || card.value == 8
       playable.push(card)
-      print "type #{playable.length} to play this card.\n"
+      if player.owner == "Player"
+        print "type #{playable.length} to play this card.\n"
+      end
     end
   end
   playable
@@ -48,7 +52,7 @@ while player1.countCards > 0 && player2.countCards > 0 && deck.countCards > 0
       #if tempCard == 8
         puts "Name suit"
         newSuit = scan.chomp
-        discard.playOn(Card.new(newSuit, nil))
+        discard.playOn(Card.new(newSuit, 8))
       else
         discard.playOn(playable[input])
       end
@@ -56,27 +60,26 @@ while player1.countCards > 0 && player2.countCards > 0 && deck.countCards > 0
     else
       puts "No playable cards ... Drawing ..."
       newCard = deck.play
-      hand.unshift(newCard)
       player1.claim([newCard])
       puts "Drew the #{newCard.cardNum} of #{newCard.suit}"
       count += 1
     end
   else
-    playable << turn(player2, player2.cardIndex, discard.onTop)
+    playable = turn(player2, player2.cardIndex, discard.onTop)
     if !playable.empty?
       input = rand(0..(playable.length-1))
+      print "played the #{playable[input].cardNum} of #{playable[input].suit}\n"
       player2.cardIndex.delete(playable[input])
+
       if playable[input].value == 8
-        puts "Name suit"
-        newSuit = scan.chomp
-        discard.playOn(Card.new(newSuit, nil))
+	suit = ["Hearts","Spades","Dimonds","Clubs"]
+        discard.playOn(Card.new(suit[rand(3)], 8))
       else
         discard.playOn(playable[input])
       end
     else
       puts "No playable cards ... Drawing ..."
       newCard = deck.play
-      hand.unshift(newCard)
       player2.claim([newCard])
       count += 1
     end
@@ -85,7 +88,11 @@ while player1.countCards > 0 && player2.countCards > 0 && deck.countCards > 0
   count = count%2
 end
   # :)
-    
+if player1.counCards <= 0
+  print "#{player1.owner} wins"
+else
+  print "#{player2.owner} wins"
+end 
 #while player1.countCards > 0 && player2.countCards > 0 && deck.countCards > 0
 #  discard.playOn(turn(player1, player1.cardIndex, discard.onTop))
 #  discard.playOn(turn(player2, player2.cardIndex, discard.onTop))
